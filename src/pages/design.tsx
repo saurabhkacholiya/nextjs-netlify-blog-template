@@ -1,23 +1,16 @@
+import { GetStaticProps } from "next";
 import Layout from "../components/Layout";
-import BasicMeta from "../components/meta/BasicMeta";
-import OpenGraphMeta from "../components/meta/OpenGraphMeta";
-import TwitterCardMeta from "../components/meta/TwitterCardMeta";
-import { SocialList } from "../components/SocialList";
+import designData from './../../content/design.json'
 
-export default function Index() {
+export default function Index(props) {
+    console.log('props: design : ', props)
   return (
-    <Layout>
-      <BasicMeta url={"/"} />
-      <OpenGraphMeta url={"/"} />
-      <TwitterCardMeta url={"/"} />
+      <>
       <div className="container">
         <div>
-          <h1>
-            Hi, We're Next.js & Netlify<span className="fancy">.</span>
+          <h1 style={{padding:'100px', color:'red'}}>
+              {props.title}
           </h1>
-          <span className="handle">@nextjs-netlify-blog</span>
-          <h2>A blog template with Next.js and Netlify.</h2>
-          <SocialList />
         </div>
       </div>
       <style jsx>{`
@@ -57,6 +50,46 @@ export default function Index() {
           }
         }
       `}</style>
-    </Layout>
+      </>
   );
 }
+
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+    const data = {
+        title : designData.title,
+        date:'',
+        slug:'',
+        tags: '',
+        author:'',
+        mdxSource:''
+    }
+    return {
+      props: {
+        title: data.title,
+        dateString: data.date,
+        slug: data.slug,
+        description: "",
+        tags: data.tags,
+        author: data.author,
+        // source: mdxSource
+      },
+    };
+    // const slug = params.post as string;
+    // const source = fs.readFileSync(slugToPostContent[slug].fullPath, "utf8");
+    // const { content, data } = matter(source, {
+    //   engines: { yaml: (s) => yaml.load(s, { schema: yaml.JSON_SCHEMA }) as object }
+    // });
+    // const mdxSource = await renderToString(content, { components, scope: data });
+    // return {
+    //   props: {
+    //     title: data.title,
+    //     dateString: data.date,
+    //     slug: data.slug,
+    //     description: "",
+    //     tags: data.tags,
+    //     author: data.author,
+    //     source: mdxSource
+    //   },
+    // };
+  };
