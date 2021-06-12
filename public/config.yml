@@ -1,5 +1,5 @@
 backend:
-  name: git-gateway
+  name: github
   branch: master
 media_folder: public/images
 public_folder: /images
@@ -140,11 +140,11 @@ collections:
       - label: "Body"
         name: "body"
         widget: "markdown"
-  - name: "main-pages"
+  - name: "design"
     label: "Main Pages 2"
     folder: "content/main-pages/"
-    extension: "mdx"
-    format: "frontmatter"
+    extension: "json"
+    format: "json"
     create: true
     slug: "{{slug}}"
     identifier_field: slug

@@ -1,5 +1,8 @@
 import dynamic from 'next/dynamic';
 import DesignView from '../design'
+if(typeof window !== "undefined"){
+    window.CMS_MANUAL_INIT = true;
+}
 
 const config = {
     "backend": {
@@ -290,10 +293,10 @@ const config = {
 
 const CMS = dynamic(
   () =>{
-    window.CMS_MANUAL_INIT = true;
+    
     return import('netlify-cms-app').then((InternalCMS: any) => {
         console.log('InternalCMS : ', InternalCMS)
-        InternalCMS.init({config: config});
+        InternalCMS.init();
 
         InternalCMS.registerPreviewTemplate('design', DesignPreview)
         // return <></>
