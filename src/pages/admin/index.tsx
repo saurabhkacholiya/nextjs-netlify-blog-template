@@ -1,13 +1,11 @@
 import dynamic from 'next/dynamic';
 import DesignView from '../design'
-if(typeof window !== "undefined"){
-    window.CMS_MANUAL_INIT = true;
-}
 
 const config = {
     "backend": {
        "name": "github",
-       "branch": "master"
+       "branch": "master",
+       "repo": "saurabhkacholiya/docusaurus-cms-poc"
     },
     "media_folder": "public/images",
     "public_folder": "/images",
@@ -212,7 +210,7 @@ const config = {
           ]
        },
        {
-          "name": "main-pages",
+          "name": "design",
           "label": "Main Pages 2",
           "folder": "content/",
           "extension": "json",
@@ -296,7 +294,9 @@ const CMS = dynamic(
     
     return import('netlify-cms-app').then((InternalCMS: any) => {
         console.log('InternalCMS : ', InternalCMS)
-        InternalCMS.init();
+        InternalCMS.init({
+            config
+        });
 
         InternalCMS.registerPreviewTemplate('design', DesignPreview)
         // return <></>
