@@ -61,7 +61,7 @@ export default function PostLayout({
         description={description}
       />
       <div className={"container"}>
-        <article>
+        <article className='prose  lg:prose-xl'>
           <header>
             <h1>{title}</h1>
             <div className={"metadata"}>
@@ -94,8 +94,6 @@ export default function PostLayout({
         {`
           .container {
             display: block;
-            max-width: 36rem;
-            width: 100%;
             margin: 0 auto;
             padding: 0 1.5rem;
             box-sizing: border-box;
