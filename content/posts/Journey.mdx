@@ -1,0 +1,144 @@
+---
+title: A Journey to Insightful Data
+description: By Neha Sood
+date: 2018-01-17
+categories: []
+keywords: []
+slug: Journey
+author: Sportan
+---
+
+By [Neha Sood](https://www.linkedin.com/in/neha-sood-60719013/)
+
+![](/a.jpg)
+
+> Despite the sense of promise surrounding Big Data, most companies estimate they are only analysing 12% of their data, while 80% of data on average is unstructured and does not lend itself to analysis easily.
+
+Big Data is much more than simply a matter of size — it presents an opportunity to discover key insights and emerging trends in data, makes businesses more agile, board room decisions better informed, and answer questions that have previously been considered unanswerable. With all the hype around big data, insightful data is eventually most important to business.
+
+<!--truncate-->
+
+At [Dream11](https://www.dream11.com/), with a growing user base of over 18 million users & ~3x YoY growth, running deep analytics & building useful insights from the data, started seeing scalability bottlenecks. The need for having a central & scalable data platform became unavoidable. _This post is about how we overcame the scalability and architecture challenges._
+
+**Challenges faced:**
+
+1. **Evolving/Changing Needs**
+
+The fast pace at which we were growing and the rising deep analytics requirements soon outdated our existing systems. Amazon [Aurora](https://aws.amazon.com/rds/aurora) is our choice of backend relational database and all our transactional data resides there. With a rapidly growing, current data volume of a few TBs, running deep data analytics was not possible anymore.
+
+2\. **Fragmented Analytics**
+
+All our transactional data & user-activities event data is being maintained in 2 distinct platforms. While one is in-house, the other one is a store maintained by a third party tool, Segment. With 2 disconnected data platforms, there is no way to run joint analytics. For instance: we need to run a simple A/B test on our platform wherein we want to experiment with the colour of “Join Contest” button. The success metric is how many of our users end up doing a transaction after they click on the particular button. This needs access to transactional data and clickstream data that are on different and disjointed data platforms.
+
+3\. **Real-time analytics at scale**
+
+The current data pipeline lacked streamlining. There was a huge opportunity here to enable & deliver real-time analytics.
+
+**The execution:**
+
+**Step 1: Identifying the Data Lake**
+
+To begin with, we needed to identify a **Data Lake**, where we could keep all type of data from all possible sources, in its raw and native format. This unstructured/semi-structured/structured data could then be refined and sourced into other data-stores based on the use-cases as well as business requirements.
+
+Primary features we needed from the Data Lake:
+
+_▪ High Durability, scalability, availability & data security at low cost_
+
+_▪ Support for heterogeneous data types: structured, unstructured & streaming_
+
+_▪ Easy to use: Data ingestion to analytics_
+
+We narrowed down our choice to [**S3**](http://aws.amazon.com/s3).
+
+**Why S3 as Data Lake?**
+
+_▪ 11 9s of Durability; 4 9s of availability_
+
+_▪ High performance, low cost & low maintenance solution_
+
+_▪ Decouple storage & compute. Both can be scaled independently_
+
+_▪ Polyglot Analytics: Provision most suitable processing engine/system based on the business requirement_
+
+This is the broad platform overview we came up with:
+
+![](/src/assets/a.jpg)
+
+**Step 2: Identifying the Data Warehouse**
+
+Next, we needed a data-warehouse that would store hot/warm data, with at least these features
+
+_▪ Easy to scale & highly performant_
+
+_▪ Supports the existing BI tools we have already invested-in (monetarily & “effort-wise”)_
+
+_▪ Easy maintenance_
+
+[Redshift](https://aws.amazon.com/documentation/redshift/) worked for us perfectly. Five key performance enablers for Redshift: [MPP](https://en.wikipedia.org/wiki/Massively_parallel) engine, [columnar data storage](http://docs.aws.amazon.com/redshift/latest/dg/c_columnar_storage_disk_mem_mgmnt.html), [data compression](https://aws.amazon.com/blogs/aws/data-compression-improvements-in-amazon-redshift/), [query optimisation, and compiled code](http://docs.aws.amazon.com/redshift/latest/dg/c-query-planning.html). Columnar storage optimises query costs by increasing the effective storage capacity of the data nodes and improves performance by reducing I/O needed to process SQL requests. Redshift’s execution engine also transforms each query into compiled code, which then runs in parallel on each compute node.
+
+Some other side benefits included:
+
+- _Its SQL_
+- _Jump-Start — you can set up a robust and fast data warehouse with no DBA in a few hours._
+- _Already on AWS — Since our application stack is already on AWS, working with Redshift didn’t involve any big leaps_
+- _Automatic updates & patching_
+- _Less maintenance overheads_
+
+An important benefit of our choices of Data Lake and Data Warehouse was that they worked really well with each other. With S3, data ingestion in Redshift can be massively parallelised, with each compute node directly working on data load, rather than being bottlenecked on leader node’s network I/O.
+
+This is the Data Platform we have in place right now:
+
+![](/a.jpg)
+
+While the user-events data still needs to be handled and pipelined into the system, the transactional data becomes available in the Data Warehouse within 2 hours of occurrence.
+
+Some important pointers:
+
+1.  Using Kafka as the communication pipeline gives this architecture additional ability to also do real-time analytics on this data, if/as needed.
+2.  For every structured dataset pushed to Kafka, we also maintain corresponding metadata in the “Schema Registry”, for easy consumption and also for handling schema changes.
+3.  In S3, each dataset is placed into difference keyspaces, further partitioned by year-month-date-hour, for data pruning optimizations and easy incremental loads. Data-partitioning rule and granularity is also configurable per data source, if needed.
+
+**Step 3: Identifying data pipeline building blocks**
+
+**Aurora to S3: Confluent connectors**
+
+Confluent is a platform that improves Apache Kafka by expanding its integration capabilities, adding tools to optimise and manage Kafka clusters. Confluent Platform makes Kafka easier to build and easier to operate. For sourcing data from our Aurora cluster to S3 via Kafka, we are using [Confluent Connectors](https://www.confluent.io/product/connectors/).
+
+Why Confluent Connector:
+
+- _Easy to scale & maintain, with transparent execution_
+- _Supports Avro_
+- _Support for JDBC/Kafka/S3_
+- _No back-pressure on source DB (unlike AWS_ [_DMS_](https://aws.amazon.com/dms/) _which works on Binlogs. Enabling binlogs adds 5–10% performance overhead on Aurora)_
+- _Out-of-the-box support for Schema Registry_
+- _Support for Kafka 0.11 — exactly once delivery_
+- _Open source_
+
+**Important pointers:**
+
+- While sourcing data from Aurora, these connectors read only committed data. So, if you have any long running transactions, make sure you choose the right delay interval while sourcing this data. In our case, we have a few aggregation tables with transaction time as high as 45–60 mins. Note that, the max transaction time on a table will add to the overall delay in making this data available in the Data-warehouse.
+- While sinking the data from Kafka, make sure you configure the “rotate interval” connector property. This will ensure the end-to-end data delays are consistent even when there is a lean period, i.e. the number of records received are lesser than the configured batch size.
+
+**S3 to Redshift**
+
+For this part of the pipeline, we needed the ability of handling duplicates, as many transactional datasets are mutable in nature. We followed the route suggested by Redshift for this process:
+
+_a) Load all incremental data in a staging table_
+
+_b. De-dupe that data_
+
+_c) Delete all corresponding entries from the main table_
+
+_d) Insert new records._
+
+We have a multi-threaded script that incrementally loads multiple datasets, following the above process, using the Redshift Copy command for initial load.
+
+Right now, we have a 1-to-1 mapping between our transactional tables & the ones in Redshift. In the long term, we plan to have denormalized view of these datasets, which makes more sense to the business & all end-users. Apart from this, we’re also evaluating having insert-only fact tables as our first layer.
+
+**Monitoring**
+
+Data pipelines are sensitive to schema changes & even issues as small as source/sink network volatility can bring them down. Planning & building a good monitoring system is as important as building the platform.
+
+Schema changes are inevitable. Such scenarios can easily break our data pipeline and the dependent ETLs. Monitoring pipelines with Confluent Connectors just narrows down to playing with their standard REST APIs. Since Kafka Connect is tightly coupled with data schemas, any incompatible schema change breaks the pipeline. We have a monitoring system keeping a check on its “Status API” and generating alerts whenever a “failure” occurs. Once the consumer processes are changed for schema compatibility, the pipeline is restarted.
+
+We’ve come a long way, but there’s still plenty to do. Watch this space as we keep sharing!

@@ -1,0 +1,82 @@
+---
+title: Profiling iOS App Launch Time
+description: >-
+  At Dream11, we put our users first. With millions of contests running
+  simultaneously optimum user experience is crucial. Moreover, to ship…
+date: 2017-12-08
+categories: []
+keywords: []
+slug: Profiling
+author: Sportan
+---
+
+![](/b.jpg)
+
+At Dream11, we put our users first. With millions of contests running simultaneously optimum user experience is crucial. Moreover, to ship features that meet these requirements the app release has increased from one to almost four times a month. As the number of user requests and concurrencies increase, every aspect of the app’s performance becomes a significant factor that could boost user loyalty. One such factor affecting the performance is the **launch time**. Let us understand why it is crucial to capture the launch time and discuss how we automate this process.
+
+<!--truncate-->
+
+### Why is it crucial to capture the launch time?
+
+The first impression of an app can be a deciding factor for the user. And the very first impression that the user forms about an app, is through the time it takes to launch. Higher launch time exponentially increases the user’s disappointment quotient. Besides, the system may kill the app for being unresponsive for too long, and we may lose the valued user in the process.
+
+### What are the types of app launches?
+
+There are three types of app launches that we need to capture data for. They are common to both iOS and Android:
+
+1.  **Cold Launch:** This means that an app’s process does not exist. It takes place when the app is launched for the first time, or the device is rebooted.
+2.  **Warm Launch:** In this type of launch, an app’s process and data already exist in the system’s memory. After the user taps the app icon, the system simply brings the app to the foreground from the existing instance of the app in the memory.
+3.  **Hot Launch:** Here, an app has not been killed by the system- it may have been moved to the background or it remains in a suspended state. The user simply brings it back to the foreground upon invocation.
+
+### What happens during the phases of an app launch?
+
+### The pre-main:
+
+The dynamic link editor (DYLD) statistics can really help in capturing the pre-main time. This is a time-measurement that starts when the app’s main method is called, till it gets control from the operating system (OS).
+
+We can get the pre-main time from Xcode. This comes before the UIApplicationMain is returned. The DYLD has a built-in environment variable to get this measurement.
+
+Once the variable is set, we get the pre-main time after running the app in Xcode’s console. The log looks something like below:
+
+This is a good starting point for measuring the launch time performance. **However, this is not the actual launch time that the user perceives.** The actual launch time is the sum of the pre-main and the post-main.
+
+### The post-main:
+
+Post-main is the time taken by an app from **UIApplicationMain** to the first screen presented to the user. In short, it is the time taken from **AppDelegate/Main** to the first frame that the app renders.
+
+Now, let us dive deeper into calculating the actual launch time and using tools to automate it.
+
+### How to build the tool?
+
+Earlier we used [Firebase](https://firebase.google.com/) and [MetricKit](https://developer.apple.com/documentation/metrickit) (iOS) to capture the app’s launch time.
+
+Why do we need an upgrade over these tools?
+
+- These tools take hours to reflect the latest data.
+- The data is only available after the app release.
+
+As the team size may continue to grow, a typical app release may have a bunch of new features going live. This may impact the launch time drastically, which may or may not be optimised before going live or until the next app release. Hence, there is a need for a tool that can provide launch time insights before the app is released. What could be better than knowing the launch time for each feature? Each feature would have its own Pull Request. If we know which pull request is affecting the launch time, then the problem causing it can be dealt with in a more effective way.
+
+### The Setup
+
+We build a script for launching the simulator, installing and running the app on it. We used **Fastlane** and **Jenkins** to run the script. Once the app is launched, we write the time taken until our first view loads into a temporary file. We repeat this process multiple times, and finally read the **average, median and the 90th percentile values**. Let us take a close look at the process, step-by-step:
+
+1\. Build the app using fastlane’s **xcodebuild** command
+
+2\. Boot the iOS simulator
+
+3\. Install the app in the simulator booted in Step 2 using **xcrun simclt**. **.app** of the app is needed for installation, it is usually located in Xcode’s derived data.
+
+4\. Use the following code to get the process time of the central processing unit (CPU). Put this code in the first interactable screen that is presented to the user. This will give the time from the app launch till the point this code is executed (time till the first screen appears). Store the time somewhere. We usually write the time in a file so that we can read the values in the next step.
+
+5\. Read launch time values from the file from Step 4 and calculate the 90th percentile of the values
+
+6\. Post the calculated values on Slack (or a similar business communication platform) and add comment on github.
+
+### The conclusion
+
+Building the launch-time automation tool helps us to smoothen the development experience, while making our own process much more efficient. It helps us get the app launch time insights early on so we can work on the optimisations, if needed. We use the data to see if the launch time is affected by the feature we are about to merge to the master. If so, then we optimise it and then re-run the whole process. This way, we are able to monitor the app launch time for every feature going live in a single release. The best part of this process is that these insights are available to us before releasing the app, and we are able to provide the best user experience every time, on Dream11!
+
+**_Acknowledgments_**
+
+[Kunal Chavan](http://www.linkedin.com/in/kunal-chavhan), [Hardik Parmar](http://linkedin.com/in/hardikjparmar), [Vinita Miranda](http://www.linkedin.com/in/vinita-miranda) and [Jignesh Agola](https://in.linkedin.com/in/jigneshagola)
