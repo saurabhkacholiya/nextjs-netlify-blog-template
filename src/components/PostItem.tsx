@@ -3,9 +3,6 @@ import Date from "./Date";
 import Link from "next/link";
 import { parseISO } from "date-fns";
 import hydrate from "next-mdx-remote/hydrate";
-import renderToString from "next-mdx-remote/render-to-string";
-
-
 
 type Props = {
   post: PostContent;
@@ -16,7 +13,7 @@ export default function PostItem({ post }: Props) {
       <a>
         <Date date={parseISO(post.date)} />
         <h2>{post.title}</h2>
-        <h2>{hydrate(post.excerpt)}</h2>
+        <h2>{hydrate(post.excerptToRender)}</h2>
         <style jsx>
           {`
             a {

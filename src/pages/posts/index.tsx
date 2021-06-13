@@ -35,7 +35,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const posts = listPostContent(1, config.posts_per_page);
 
   for (let index = 0; index < posts.length; index++) {
-    posts[index].excerpt = await renderToString(posts[index].excerpt);
+    posts[index].excerptToRender = await renderToString(posts[index].excerpt);
   }
 
 
