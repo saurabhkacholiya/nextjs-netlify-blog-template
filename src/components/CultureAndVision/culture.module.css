@@ -1,0 +1,26 @@
+.cultureAndVisionSection{
+  margin-bottom: 50px;
+}
+
+.cultureSection{
+  border-bottom: 1px solid rgb(212, 211, 211);
+  padding-bottom: 40px;
+  padding-top: 40px;
+}
+
+.visionSection{
+  padding-top: 40px
+}
+
+.flex_center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 10px 0 10px 0px;
+}
+
+@media screen and (max-width: 500px) {
+  .row_reverse {
+    flex-direction: row-reverse;
+  }
+}

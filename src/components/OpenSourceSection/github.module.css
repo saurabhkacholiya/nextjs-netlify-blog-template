@@ -1,0 +1,14 @@
+.openSourceSectionContainer{
+  margin-bottom: 50px;
+}
+
+.container {
+  display: flex;
+  background-color: #fff;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  padding: 16px;
+  min-width: 330px;
+  flex-direction: column;
+  min-height: 140px;
+}
