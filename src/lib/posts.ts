@@ -2,6 +2,7 @@ import fs from "fs";
 import matter from "gray-matter";
 import path from "path";
 import yaml from "js-yaml";
+import { MdxRemote } from "next-mdx-remote/types";
 
 const postsDirectory = path.join(process.cwd(), "content/posts");
 
@@ -11,7 +12,8 @@ export type PostContent = {
   readonly slug: string;
   readonly tags?: string[];
   readonly fullPath: string;
-  readonly excerpt: string;
+  excerpt: string;
+  excerptToRender: MdxRemote.Source
 };
 
 let postCache: PostContent[];
