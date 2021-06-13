@@ -10,10 +10,10 @@ type Props = {
 export default function PostItem({ post }: Props) {
   return (
     <Link href={"/posts/" + post.slug}>
-      <a>
+      <article className='prose lg:prose-xl'>
         <Date date={parseISO(post.date)} />
         <h2>{post.title}</h2>
-        <h2>{hydrate(post.excerptToRender)}</h2>
+        <p>{hydrate(post.excerptToRender)}</p>
         <style jsx>
           {`
             a {
@@ -26,7 +26,7 @@ export default function PostItem({ post }: Props) {
             }
           `}
         </style>
-      </a>
+      </article>
     </Link>
   );
 }

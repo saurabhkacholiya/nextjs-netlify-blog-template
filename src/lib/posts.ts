@@ -33,8 +33,9 @@ export function fetchPostContent(): PostContent[] {
 
       // Use gray-matter to parse the post metadata section
       const matterResult = matter(fileContents, {
-        excerpt: function(file, {}){
+        excerpt: function(file:any){
           file.excerpt =  file.content.split('<!--truncate-->')[0]
+          return file.excerpt
         },
         engines: {
           yaml: (s) => yaml.load(s, { schema: yaml.JSON_SCHEMA }) as object,
@@ -47,6 +48,8 @@ export function fetchPostContent(): PostContent[] {
         tags: string[];
         slug: string;
         fullPath: string,
+        excerpt: string,
+        excerptToRender: null
       };
 
       matterData.fullPath = fullPath;
