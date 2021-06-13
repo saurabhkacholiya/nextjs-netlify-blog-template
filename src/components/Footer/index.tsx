@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./styles.module.css";
-const fbImg = require("./../../../public/Facebook.jpg");
+const fbImg = require("../../../public/Facebook.jpg");
 const instaImg = require("../../../public/instagram.jpg");
 const linkedinImg = require("../../../public/Linkedin.jpg");
 const twitterImg = require("../../../public/Twitter.jpg");
