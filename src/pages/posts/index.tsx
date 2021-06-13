@@ -8,6 +8,7 @@ import config from "../../lib/config";
 import { countPosts, listPostContent, PostContent } from "../../lib/posts";
 import { listTags, TagContent } from "../../lib/tags";
 import Head from "next/head";
+import renderToString from "next-mdx-remote/render-to-string";
 
 type Props = {
   posts: PostContent[];
@@ -32,6 +33,12 @@ export default function Index({ posts, tags, pagination }: Props) {
 
 export const getStaticProps: GetStaticProps = async () => {
   const posts = listPostContent(1, config.posts_per_page);
+
+  for (let index = 0; index < posts.length; index++) {
+    posts[index].excerpt = await renderToString(posts[index].excerpt);
+  }
+
+
   const tags = listTags();
   const pagination = {
     current: 1,

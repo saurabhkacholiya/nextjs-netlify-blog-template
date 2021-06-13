@@ -275,7 +275,6 @@ const DesignPreview = (props) => {
 const CMS = dynamic(
   () => {
     return import("netlify-cms-app").then((InternalCMS: any) => {
-      console.log("InternalCMS : ", InternalCMS);
       InternalCMS.init({
         config,
       });

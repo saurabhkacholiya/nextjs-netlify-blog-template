@@ -11,6 +11,7 @@ export type PostContent = {
   readonly slug: string;
   readonly tags?: string[];
   readonly fullPath: string;
+  readonly excerpt: string;
 };
 
 let postCache: PostContent[];
@@ -30,10 +31,14 @@ export function fetchPostContent(): PostContent[] {
 
       // Use gray-matter to parse the post metadata section
       const matterResult = matter(fileContents, {
+        excerpt: function(file, {}){
+          file.excerpt =  file.content.split('<!--truncate-->')[0]
+        },
         engines: {
           yaml: (s) => yaml.load(s, { schema: yaml.JSON_SCHEMA }) as object,
         },
       });
+
       const matterData = matterResult.data as {
         date: string;
         title: string;
@@ -41,6 +46,7 @@ export function fetchPostContent(): PostContent[] {
         slug: string;
         fullPath: string,
       };
+
       matterData.fullPath = fullPath;
 
       const slug = fileName.replace(/\.mdx$/, "");
@@ -51,6 +57,8 @@ export function fetchPostContent(): PostContent[] {
           "slug field not match with the path of its content source"
         );
       }
+
+      matterData.excerpt = matterResult.excerpt
 
       return matterData;
     });

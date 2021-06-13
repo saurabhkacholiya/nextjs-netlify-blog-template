@@ -3,7 +3,6 @@ import Layout from "../components/Layout";
 import designData from './../../content/design.json'
 
 export default function Index(props) {
-    console.log('props: design : ', props)
   return (
       <>
       <div className="container">
