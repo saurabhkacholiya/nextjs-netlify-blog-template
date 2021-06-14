@@ -57,11 +57,11 @@ export default function PostLayout({
         title={title}
         keywords={keywords}
         date={date}
-        author={authorName}
+        // author={authorName}
         description={description}
       />
       <div className={"container"}>
-        <article>
+        <article className='prose  lg:prose-xl'>
           <header>
             <h1>{title}</h1>
             <div className={"metadata"}>
@@ -70,7 +70,7 @@ export default function PostLayout({
               </div>
               <div>
                 {/* <Author author={getAuthor(author)} /> */}
-                <Author author={{ name: "Sportan" }} />
+                {/* <Author author={{ name: "Sportan" }} /> */}
               </div>
             </div>
           </header>
@@ -94,8 +94,6 @@ export default function PostLayout({
         {`
           .container {
             display: block;
-            max-width: 36rem;
-            width: 100%;
             margin: 0 auto;
             padding: 0 1.5rem;
             box-sizing: border-box;

@@ -1,0 +1,25 @@
+.jobs{
+    margin-bottom: 50px;
+}
+
+.jobContainer{
+    margin-bottom:10px
+}
+
+.jobTitle{
+    margin:0
+}
+
+.searchContainer {
+    width: 50%
+}
+
+.headerContainer{
+    margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+    .searchContainer {
+      width: 100%
+    }
+}

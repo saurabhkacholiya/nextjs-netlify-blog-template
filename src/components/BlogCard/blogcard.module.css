@@ -1,0 +1,45 @@
+.card {
+  position: relative;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  transition: 0.3s;
+  position: relative;
+  min-height: 270px;
+  display: flex;
+  border-radius: 12px;
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+.blogSectionContainer{
+  margin-bottom: 50px;
+}
+.container {
+  color: #000;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: end;
+  word-wrap: break-word;
+}
+
+.responsive_img {
+  width: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.titleStyle {
+  position: absolute;
+  bottom: 0px;
+  height: 36%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  background: linear-gradient(0deg, #151515, #4e4e4e 32%, transparent);
+  color: white;
+  padding-bottom: 10px;
+  border-radius: 12px;
+}
